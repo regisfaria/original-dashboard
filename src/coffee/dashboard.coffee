@@ -145,10 +145,12 @@ class Dashboard
     @sendMessage(message)
     @
 
+  # função que inicia o download dos logs
   downloadLogs: (message) ->
     moodle = @getMoodle(message.moodle)
     moodle.setCourse(message.course)
     course = moodle.getCourse().name.replace(/\s/g, '_')
+    # talvez seja preciso alterar a função abaixo
     logs = moodle.getLogs()
     csv = ''
     columns = Object.keys(logs[0])

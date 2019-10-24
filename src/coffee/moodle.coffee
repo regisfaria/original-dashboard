@@ -1,7 +1,6 @@
 ###
 # moodle: moodle data
 ###
-
 class Moodle
   constructor: (options) ->
     if options
@@ -98,7 +97,14 @@ class Moodle
 
   syncUsers: (course, response) ->
     $.ajax(
-      url: @url + '/enrol/users.php'
+      #regex para saber se estamos no moodle da ufsc
+      regex = /ufsc/
+      path = ''
+      if @url.match(regex)
+        url: @url + '/user/index.php?id='
+      else
+        url: @url + '/enrol/users.php'
+      #url: @url + '/enrol/users.php'
       data:
         id: course.id
       success: (data) =>
@@ -213,11 +219,13 @@ class Moodle
   syncDates: (response) ->
     unless @hasCourses()
       return response(
+        console.log 'problema no hasCourses'
         Moodle.response().sync_no_courses,
         Moodle.response().sync_dates
       )
     unless @hasUsers()
       return response(
+        console.log 'problema no hasUsers'
         Moodle.response().sync_no_users,
         Moodle.response().sync_dates
       )
@@ -237,6 +245,7 @@ class Moodle
         )
         unless timelist.length
           return response(
+            console.log 'problema na timelist do syncDates'
             Moodle.response().sync_no_dates,
             Moodle.response().sync_dates
           )
@@ -282,12 +291,14 @@ class Moodle
         )
       error: ->
         response(
+          console.log 'erro no ajax da syncDates'
           Moodle.response().sync_no_moodle_access,
           Moodle.response().sync_dates
         )
     )
     @
 
+  # Analisar esta função - download csv
   syncData: (course, time, response) ->
     $.ajax(
       url: @url + '/report/log/'
@@ -333,6 +344,7 @@ class Moodle
     )
     @
 
+  # [ ] Arranjar uma maneira de trazer os logs para esta funçao
   processRaw: (course, time, data, type) ->
     realtime = time * 1000
     logs = data.replace(/\"Saved\sat\:(.+)\s/, '')
@@ -521,6 +533,7 @@ class Moodle
 
   getLogs: ->
     course = @getCourse()
+    # [ ] checar se este unless vai bugar com a remoção da sync
     unless course.logs && Object.keys(course.logs).length
       return
     days = Object.keys(course.logs).sort((a, b) ->
@@ -548,6 +561,7 @@ class Moodle
   getURL: ->
     @url
 
+  # retorna o objeto curso que foi clicado no dashborad
   getCourse: ->
     for course in @courses
       if course.selected
