@@ -395,40 +395,21 @@ class Client
       $('#moodle-select').show()
     @
 
-  '''
-     <label for="thefile">Upload local .csv file</label>
-     <input type="file" name="fileinput" id="thefile" accept=".csv" />
-  '''
   # função que adiciona lista de cursos
-  # [X] criar um upload do .csv aqui
-  # [ ]add classe para esconder o input
+  # [ ] criar um upload do .csv aqui
   responseCourses: (message) ->
     html = '<ul class="nav course-list">'
     for course, i in message.courses
-      html += '<li><label id="course' + i + '" for="inputfiles' + i + '">' + course.name + '</label>'
-      html += '<input type="file" accept=".csv" id="inputfiles' + i + '" class="withripple'
-      html += '" style="display:none;font-size:2.2rem;" />'+ '</li>'
+      html += '<li><a type="file" href="#" index="' + i + '" class="withripple'
+      html += '">' + course.name + '</a></li>'
     html += '</ul>'
     $('#submenu-courses').html(html)
     @navActive()
-    $('.course-list li label').on('click', (evt) =>
+    $('.course-list li a').on('click', (evt) =>
       @onCourseSelect($(evt.currentTarget))
     )
     @
-  ''' Old responseCourses function
-    responseCourses: (message) ->
-      html = '<ul class="nav course-list">'
-      for course, i in message.courses
-        html += '<li><a type="file" href="#" index="' + i + '" class="withripple'
-        html += '">' + course.name + '</a></li>'
-      html += '</ul>'
-      $('#submenu-courses').html(html)
-      @navActive()
-      $('.course-list li a').on('click', (evt) =>
-        @onCourseSelect($(evt.currentTarget))
-      )
-      @
-  '''
+
   onCourseSelect: (course) ->
     content  = $('#dashboard-content')
     title = $('.header > .box > .title', content)
