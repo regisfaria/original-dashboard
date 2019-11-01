@@ -300,6 +300,24 @@ class Moodle
 
   # Analisar esta função - download csv
   syncData: (course, time, response) ->
+    '''
+     Acho que oq posso fazer aqui é achar o curso equivalente que foi chamado com a função
+    e em seguida procurar no html da pagina o .csv que foi submetido localmente
+    '''
+    # Criar um parser que vai encontrar os cursos que foram achados na sessão atual
+    console.log 'entrou na syncData'
+    parser = new DOMParser()
+    doc = parser.parseFromString(@html, 'text/html')
+    coursesCrawled = $('ul > li > label', doc)
+    for item in coursesCrawled
+      # []preciso saber oq é esse course para comparar os nomes
+      if item.textContent == course.course
+        # preciso achar o .csv e jogar para dentro da data
+        data = 
+        @processRaw(course, time, data, 'csv')
+      else
+        console.log '404 - not found'
+    '''
     $.ajax(
       url: @url + '/report/log/'
       data:
@@ -343,15 +361,20 @@ class Moodle
         )
     )
     @
+    '''
 
   # [ ] Arranjar uma maneira de trazer os logs para esta funçao
   processRaw: (course, time, data, type) ->
     realtime = time * 1000
+    console.log 'AAAAA: Testando: ' + course + ' -- AND --> ' + course.course
+    
+    
     logs = data.replace(/\"Saved\sat\:(.+)\s/, '')
     unless course.logs
       course.logs = {}
     course.logs[realtime] = d3[type].parse(logs)
     users = {}
+    # aqui pra baixo já tem os logs
     for row in course.logs[realtime]
       username = (row['User full name'] || row['Nome completo']).trim()
       unless users[username]
@@ -474,6 +497,22 @@ class Moodle
     @selected = @equals(url) && @hasUsers()
     @
 
+  '''
+  $('#thefile').change (e) ->
+  if e.target.files != undefined
+    reader = new FileReader
+
+    reader.onload = (e) ->
+      $('#text').text e.target.result
+      return
+
+    reader.readAsText e.target.files.item(0)
+  false
+  '''
+  '''
+  getLocalLogs: (course) ->
+    continue
+  '''
   getActivities: (role) ->
     unless @hasData()
       return
@@ -534,7 +573,9 @@ class Moodle
   getLogs: ->
     course = @getCourse()
     # [ ] checar se este unless vai bugar com a remoção da sync
+    console.log 'rodando funçao getLogs'
     unless course.logs && Object.keys(course.logs).length
+      console.log 'entrou no unless do getLOGS'
       return
     days = Object.keys(course.logs).sort((a, b) ->
       a = parseInt(a)
@@ -635,7 +676,9 @@ class Moodle
     @getCourse().errors.length > 0
 
   hasData: ->
-    @hasDates() && @getLastSync() > 0
+    #old code below
+    #@hasDates() && @getLastSync() > 0
+    @hasDates() > 0
 
   isSelected: ->
     @selected

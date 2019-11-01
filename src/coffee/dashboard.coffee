@@ -125,8 +125,10 @@ class Dashboard
     moodle = @getMoodle(message.moodle)
     moodle.setCourse(message.course)
     message.cmd = 'responseDates'
+    # Por algum motivo não consegue entrar no if abaixo
     if moodle.hasDates()
       message.dates = moodle.getDates()
+      console.log '--> Tem datas e são: ' + message.dates
     @sendMessage(message)
     @
 
@@ -141,7 +143,11 @@ class Dashboard
     moodle = @getMoodle(message.moodle)
     moodle.setCourse(message.course)
     message.cmd = 'responseLogs'
-    message.logs = moodle.getLogs()
+    # talvez eu tenha que por os logs aqui
+    #message.logs = moodle.getLogs()
+    message.course = moodle.getCourse()
+    console.log '--> getLogs: vou mostrar o message.course: ' + message.course.name
+    #message.logs = moodle.getLocalLogs(message.course)
     @sendMessage(message)
     @
 
@@ -178,13 +184,18 @@ class Dashboard
     moodle.setCourse(message.course)
     message.cmd = 'responseData'
     message.error = !moodle.hasData()
+    console.log 'entrou an getData'
+    console.log message.error
     unless message.error
+      console.log 'passou noo unless da get data'
       data = moodle.getCourseData()
       if data
         message.data = data
+      #Oq isso faz??
       message.filters =
         list: moodle.getActivities(message.role)
         filtrated: @settings.filters
+      console.log 'A função getData está rodando CHECK'
     @sendMessage(message)
     @
 

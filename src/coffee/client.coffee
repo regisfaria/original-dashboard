@@ -411,24 +411,13 @@ class Client
     html += '</ul>'
     $('#submenu-courses').html(html)
     @navActive()
+    # A linha abaixo trata o clique em um item da lista
     $('.course-list li label').on('click', (evt) =>
       @onCourseSelect($(evt.currentTarget))
     )
     @
-  ''' Old responseCourses function
-    responseCourses: (message) ->
-      html = '<ul class="nav course-list">'
-      for course, i in message.courses
-        html += '<li><a type="file" href="#" index="' + i + '" class="withripple'
-        html += '">' + course.name + '</a></li>'
-      html += '</ul>'
-      $('#submenu-courses').html(html)
-      @navActive()
-      $('.course-list li a').on('click', (evt) =>
-        @onCourseSelect($(evt.currentTarget))
-      )
-      @
-  '''
+    
+  # Analisar essa função
   onCourseSelect: (course) ->
     content  = $('#dashboard-content')
     title = $('.header > .box > .title', content)
@@ -440,6 +429,7 @@ class Client
     else
       @course = parseInt(course.attr('index'))
       @role = 0
+      # As duas linhas abaixo mudam o titulo do dashboard para o curso selecionado
       title.html(course.html())
       subtitle.html('')
       if content.is(':visible')
@@ -555,6 +545,7 @@ class Client
 
   responseDates: (message) ->
     if message.dates
+      console.log 'entrou no responseDates'
       daterange = $('#submenu-daterange')
       $('.date-min, .date-max', daterange).unbind('dp.change')
       @dates = message.dates
@@ -654,8 +645,39 @@ class Client
       )
     @
 
+  # Acho que essa função faz parte do download dos logs
   responseData: (message) ->
-    unless message.course == @getCourse() && message.role == @getRole()
+    unless message.course == @getCourse()
+      console.log '--> responseData: entrou no primeiro unless'
+      return
+    # Esse if ??
+    if message.filters
+      @setFilters(message.filters)
+      console.log 'entrou no if filters responseData: ' + message.filters
+    content = $('#dashboard-content')
+    console.log '--> responseData: ' + content.name
+    if !message.data || message.error
+      console.log '--> responseData: Não tem data e tem erro'
+      $('.data', content).hide()
+      $('.default', content).show()
+    else
+      console.log '--> responseData: else'
+      unless $('.data', content).is(':visible')
+        console.log '--> responseData: data is showing'
+        $('.default', content).hide()
+        $('.data', content).show()
+      view.render(
+        message.data,
+        message.role,
+        message.filters.filtrated
+      )
+      @navActive()
+    # A linha abaixo faz uma resposta visual para avisar ao usuario que não tem data
+    $('.default .message', content).html(__('No data'))
+    @
+  '''
+  #old responseData function
+  unless message.course == @getCourse() && message.role == @getRole()
       return
     if message.filters
       @setFilters(message.filters)
@@ -675,23 +697,21 @@ class Client
       @navActive()
     $('.default .message', content).html(__('No data'))
     @
+  '''
 
   '''
-  Esta função realiza a resposta visual da sincronização quando clicamos em um moodle
-  e caso tenha sucesso, encaminnha a aplicação para outras rotinas
-
-  Aqui temos de fazer alterações
-
-  Nota 1: É possivel prosseguir implementando dentro do if que comentei com #erro_na_sync_aqui, mas
-  seria mais interessante entender oque começa a rotina de sincronização e refazer esta função
+  1. Quando clica em um curso essa função é chamada
+  OBJETIVO:
+  Conseguir processar o .csv a partir daqui
   '''
   responseSync: (message) ->
     unless message.course == @getCourse()
       return
-    #oq o item abaixo faz??
+    
     sync = $('#moodle-sync')
-    @sendMessage('testFunction')
-    console.log 'Cliquei em um curso'
+    console.log 'entrou na responseSync'
+    # a parte comentada faz uma barra de progresso enquanto baixa os logs, removi pq nao usamos mais
+    
     '''
     $('.progress', sync).removeClass('progress-striped').removeClass('active')
     $('.progress .progress-bar-success', sync).css('width', '0')
@@ -701,28 +721,26 @@ class Client
     success = Math.floor(progress.success / progress.total * 100)
     error = Math.floor(progress.error / progress.total * 100)
     total = progress.success + progress.error
+    '''
+    # NOTA:
+    #   É possivel usar @sendMessage('functionName') para chamar funções
+    #  de outros .coffee do projeto.
+    #   Talvez eu consiga iniciar a sincronização através de uma função que pega e retorna um .csv
+    #  para então eu conseguir processa-lo.
+    @sendMessage('getDates')
+    .sendMessage('getData')
 
-    #erro_na_sync_aqui
-    if !total && message.error
-      if !message.silent && message.showError
-        console.log 'Objeto message.error: ' + message.error
-        console.log 'Objeto message.showError: ' + message.showError
-        status = @sendMessage('testFunction')
-        if status
-          console.log "Caminho certo!"
-        #@showMessage(__('Error synchronizing'), __('error_synchronizing_msg'))
-    else
-      if progress.total > 1
-        $('.progress .progress-bar-success', sync).css('width', success + '%')
-        $('.progress .progress-bar-danger', sync).css('width', error + '%')
-        $('.progress-score', sync).html(success + error + '%')
-      else if !message.silent
-        $('.progress .progress-bar-success', sync).css('width', '60%')
-        $('.progress', sync).addClass('progress-striped').addClass('active')
-      if !sync.is(':visible') && !message.silent
-        $('.modal').not(sync).modal('hide')
-        sync.modal('show')
-      if total == progress.total
+    setTimeout(
+          =>
+            $(sync).modal('hide')
+            unless message.silent
+              console.log '--> responseSync: Passou no unless'
+              @sendMessage('getLogs')
+          , 1000
+    )
+    @
+    '''
+        #VER A PARTIR DAQUI
         @sendMessage('getDates')
         .sendMessage('getData')
         setTimeout(
@@ -744,9 +762,8 @@ class Client
                 @showMessage(__('Warning'), html)
           , 1000
         )
-    '''
     @
-
+'''
   getMoodle: ->
     @url
 
