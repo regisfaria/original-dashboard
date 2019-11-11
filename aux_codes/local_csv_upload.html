@@ -1,0 +1,32 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="upload.css">
+  </head>
+  <form>
+    <label for="thefile">Upload local .csv file</label>
+    <input type="file" name="fileinput" id="thefile" accept=".csv" />
+  </form>
+  <div id="text"></div>
+</html>
+
+
+<script
+        src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+        crossorigin="anonymous">
+</script>
+
+<script>
+$('#thefile').change(function(e) {
+if (e.target.files != undefined) {
+	var reader = new FileReader();
+	reader.onload = function(e) {
+	  $('#text').text(e.target.result);
+	};
+	reader.readAsText(e.target.files.item(0));
+}
+return false;
+});
+</script>
