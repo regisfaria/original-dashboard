@@ -51,6 +51,42 @@ Moodle dashboard é distribuído gratuitamente sob os termos da [licença MIT][l
 
 ## Anotações
 
+atributos de course:
+
+course.id
+
+course.users
+  course.users.[role].list
+  course.users.filter((user)
+  course.users.push
+  course.users[p]
+  course.users.sort((a, b)
+  course.users[0].selected
+
+course.users_not_found
+  course.users_not_found[user]
+
+course.dates
+  course.dates.max
+    course.dates.max.value
+    course.dates.max.selected
+  course.dates.min
+    course.dates.min.value
+    course.dates.min.selected
+
+course.name
+
+course.errors
+  '''course.errors.push(time)
+
+course.course
+
+course.logs
+  course.logs[realtime]
+  course.logs[day]
+
+course.selected
+
 ### Organização do projeto (raiz)
 
 /dist -> pasta onde é gerado o plugin na estrutura e linguagens que o chrome suporta (html + css + js),
@@ -125,7 +161,7 @@ for publicar em uma conta própria, existe uma taxa de ativação de conta de de
  e passar a trabalhar somente com essas linguagens
 
 	- less é um css que suporta váriaves, "funções", aninhamento, ...
-	
+
 	- coffeescript é um js com frescuras "inspiradas" em python e ruby.
 
 ### Algumas outras duvidas
