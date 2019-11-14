@@ -12,41 +12,47 @@
 
 ## Anotações
 
-atributos de course:
+-> Algumas funções uteis:
+  Object.getOwnPropertyNames(_objectName_): lista os metodos de um objeto
+  JSON.stringify(_objectName_): lista os atributos e seus respectivos valores de um objeto
 
-course.id
+-> Atributos de course:
 
-course.users
-  course.users.[role].list
-  course.users.filter((user)
-  course.users.push
-  course.users[p]
-  course.users.sort((a, b)
-  course.users[0].selected
+  course.id
 
-course.users_not_found
-  course.users_not_found[user]
+  course.users
+    course.users.[role].list
+    course.users.filter((user)
+    course.users.push
+    course.users[p]
+    course.users.sort((a, b)
+    course.users[0].selected
 
-course.dates
-  course.dates.max
-    course.dates.max.value
-    course.dates.max.selected
-  course.dates.min
-    course.dates.min.value
-    course.dates.min.selected
+  course.users_not_found
+    course.users_not_found[user]
 
-course.name
+  course.dates
+    course.dates.max
+      course.dates.max.value
+      course.dates.max.selected
+    course.dates.min
+      course.dates.min.value
+      course.dates.min.selected
 
-course.errors
-  '''course.errors.push(time)
+  course.name
 
-course.course
+  course.errors
+    '''course.errors.push(time)
 
-course.logs
-  course.logs[realtime]
-  course.logs[day]
+  course.course
 
-course.selected
+  course.logs
+    course.logs[realtime]
+    course.logs[day]
+
+  course.selected
+
+-> Para pegar o nome do curso clicado no dashboard usamos 'course.html()'
 
 ### Organização do projeto (raiz)
 
@@ -127,17 +133,11 @@ for publicar em uma conta própria, existe uma taxa de ativação de conta de de
 
 ### Algumas outras duvidas
 
-  1. Em moodle.coffee temos duas funções que não entendi seu conteudo. ProcessRow e ProcessRaw
+  1. Arranjar um jeito de ao invez de a box de enviar arquivo, aparecer uma janela intermediaria
+    para que o usuario receba uma msg sobre como upar um arquivo localmente.
 
-  2. line 694 - sendDataToFlaskServer:
-
-    acho que posso excluir as funções de conexão com flask, já que não estamos mais usando este servdor.
-
+  2. Qual a diferença entre usar sendMessage() e chamar a função moodle.nomeFunção()?
+  
   3. Como limpar os cursos depois que a extensão fechar?
     (para não ter 'lixo' com cursos de outro usuario)
 
-  4. Problema em moodle.coffee
-    As informações do usuario estão agrupadas em um id=user-index-participants-113065_rX
-    onde "X" é um numero de 0 até a qtd de participantes -1.
-
-  Como eu faço para acesar essa informação através do html??
