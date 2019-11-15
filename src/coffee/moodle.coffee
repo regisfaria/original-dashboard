@@ -458,10 +458,17 @@ class Moodle
       error: -> response()
     )
     @
-
+  
+  getCourseIndex: (name) ->
+    for course, i in @courses
+      if name == course.name
+        return i
+  
   setCourse: (id) ->
     for course, i in @courses
       course.selected = (i == id)
+      if course.selected
+        console.log '--> setCourse: O curso selecionado foi: ' + course.name
     @
 
   setUser: (role, user, selected) ->
@@ -606,6 +613,7 @@ class Moodle
   getCourse: ->
     for course in @courses
       if course.selected
+        console.log '--> getCourse: O curso retornado foi: ' + course.name
         return course
 
   getCourseList: ->
@@ -667,8 +675,10 @@ class Moodle
 
   hasDates: ->
     unless @hasCourses()
+      console.log '--> hasDates: retornou false'
       return false
-    @getCourse().dates?
+    #no final de dates tinha um sinal de ?, tirei pois não sabia oq faz
+    @getCourse().dates
 
   hasErrors: ->
     unless @hasCourses()

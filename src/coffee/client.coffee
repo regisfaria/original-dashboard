@@ -427,7 +427,7 @@ class Client
         $('.main').hide()
         content.show()
     else
-      @course = parseInt(course.attr('index'))
+      @course = course.html()
       @role = 0
       # As duas linhas abaixo mudam o titulo do dashboard para o curso selecionado
       title.html(course.html())
@@ -438,10 +438,17 @@ class Client
       else
         $('.main').hide()
         content.show()
-      @sendMessage('getUsers')
+      @sendMessage('syncMessageMissingData')
+      # Preciso concertar todas esssas funções e suas respectivas responses
+      #[ ] OK
+      .sendMessage('getUsers')
+      #[ ] OK
       .sendMessage('getDates')
+      #[ ] OK
       .sendMessage('getData')
+      #[ ] OK
       .sendMessage('getLogs')
+    #[ ] OK
     @sendMessage('syncData')
     $('.default .message', content).html(__('Loading') + ' ...')
     @
@@ -768,7 +775,10 @@ class Client
     @url
 
   getCourse: ->
-    @course || 0
+    if @course
+      @course
+    else
+      0
 
   getRole: ->
     @role || 0
@@ -1130,6 +1140,7 @@ class Client
     msg.id = @id || 0
     msg.moodle = @getMoodle()
     msg.course = @getCourse()
+    msg.course_index = undefined
     msg.role = @getRole()
     chrome.runtime.sendMessage(msg)
     @

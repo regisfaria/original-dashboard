@@ -139,17 +139,39 @@ class Dashboard
       moodle.setDates(message.dates)
     @
 
+  syncMessageMissingData: (message) ->
+    moodle = @getMoodle(message.moodle)
+    # para setar um curso, é testado seus indices, então primeiro pego o indice do curso na lista de cursos
+    message.course_index = moodle.getCourseIndex(message.course)
+    message.course = moodle.getCourse()
+    @
+  
+  '''
+   O problema que temos aqui é que a função setCourse testa em um loop pelo index passado
+  comparando com o index da lista de cursos que foi crawleada.
+   
+   Desta maneira, o atributo selected vai ser 1 apenas para o curso clicado e 0 para os demais.
+   
+   Tenho que arranjar uma maneira de descobrir qual é o index do curso que eu selecionei no dashboard
+  para então conseguir jogar ele na função de setar qual curso estou selecionando.
+  '''
   getLogs: (message) ->
     moodle = @getMoodle(message.moodle)
-    moodle.setCourse(message.course)
+    moodle.setCourse(message.course_index)
     message.cmd = 'responseLogs'
-    # talvez eu tenha que por os logs aqui
-    #message.logs = moodle.getLogs()
-    message.course = moodle.getCourse()
-    console.log '--> getLogs: vou mostrar o message.course: ' + message.course.name
     #message.logs = moodle.getLocalLogs(message.course)
     @sendMessage(message)
     @
+  '''
+  old getLogs:
+    getLogs: (message) ->
+    moodle = @getMoodle(message.moodle)
+    moodle.setCourse(message.course)
+    message.cmd = 'responseLogs'
+    message.logs = moodle.getLogs()
+    @sendMessage(message)
+    @
+  '''
 
   # função que inicia o download dos logs
   downloadLogs: (message) ->
@@ -184,8 +206,7 @@ class Dashboard
     moodle.setCourse(message.course)
     message.cmd = 'responseData'
     message.error = !moodle.hasData()
-    console.log 'entrou an getData'
-    console.log message.error
+    console.log 'entrou an getData: ' + moodle.hasData()
     unless message.error
       console.log 'passou noo unless da get data'
       data = moodle.getCourseData()
