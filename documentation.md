@@ -1,14 +1,15 @@
 # documentation
 
-
 ## TODOS
 
 - [x] Criar um jeito de upar um .csv localmente
-- [ ] Integrar o arquivo .csv que foi upado localmente na aplicação
+- [ ] Concertar as funções que são chamadas pelo sendMessage no client.coffee(line 441)
+- [ ] Substituir a função moodle.getLogs para moodle.getLocalLogs(implementar semelhante)
+- [ ] Integrar o arquivo .csv que foi upado localmente na aplicação e usar no processamento de dados
 
 ## Bugs Atuais
 
-
+MUITOS!! =/
 
 ## Anotações
 
@@ -135,8 +136,6 @@ for publicar em uma conta própria, existe uma taxa de ativação de conta de de
 
   1. Arranjar um jeito de ao invez de a box de enviar arquivo, aparecer uma janela intermediaria
     para que o usuario receba uma msg sobre como upar um arquivo localmente.
-
-  2. Qual a diferença entre usar sendMessage() e chamar a função moodle.nomeFunção()?
   
   3. Como limpar os cursos depois que a extensão fechar?
     (para não ter 'lixo' com cursos de outro usuario)
