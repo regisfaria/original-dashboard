@@ -11,3 +11,4 @@ dist/*.json
 dist/_locales/*.json
 **/*.zip
 **/*.tar.gz
+notes.txt
