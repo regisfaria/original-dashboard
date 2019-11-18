@@ -441,15 +441,15 @@ class Client
       @sendMessage('syncMessageMissingData')
       # Preciso concertar todas esssas funções e suas respectivas responses
       #[ ] OK
-      .sendMessage('getUsers')
+      #.sendMessage('getUsers')
       #[ ] OK
-      .sendMessage('getDates')
+      #.sendMessage('getDates')
       #[ ] OK
-      .sendMessage('getData')
+      #.sendMessage('getData')
       #[ ] OK
-      .sendMessage('getLogs')
+      #.sendMessage('getLogs')
     #[ ] OK
-    @sendMessage('syncData')
+    #@sendMessage('syncData')
     $('.default .message', content).html(__('Loading') + ' ...')
     @
 
@@ -1140,7 +1140,7 @@ class Client
     msg.id = @id || 0
     msg.moodle = @getMoodle()
     msg.course = @getCourse()
-    msg.course_index = undefined
+    msg.course_index = -1
     msg.role = @getRole()
     chrome.runtime.sendMessage(msg)
     @

@@ -623,6 +623,8 @@ class Moodle
 
   getRoles: ->
     for role in @getCourse().users
+      console.log '--> getRoles: a role é: ' + role
+      console.log '--> getRoles: a role.role é: ' + role.role
       name: role.role
 
   getUser: (course, username) ->

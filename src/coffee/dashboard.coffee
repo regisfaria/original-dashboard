@@ -143,7 +143,9 @@ class Dashboard
     moodle = @getMoodle(message.moodle)
     # para setar um curso, é testado seus indices, então primeiro pego o indice do curso na lista de cursos
     message.course_index = moodle.getCourseIndex(message.course)
+    moodle.setCourse(message.course_index)
     message.course = moodle.getCourse()
+    console.log '--> syncMEssageMissingData: o curso que foi clicado:' + message.course.name
     @
   
   '''
@@ -468,6 +470,7 @@ class Dashboard
           'getConfig',
           'setConfig',
           'deleteMoodle',
+          'syncMessageMissingData',
           'defaultConfig',
           'sendMessageToMoodle'
         ]
