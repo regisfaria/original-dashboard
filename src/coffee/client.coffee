@@ -441,7 +441,7 @@ class Client
       @sendMessage('syncMessageMissingData')
       # Preciso concertar todas esssas funções e suas respectivas responses
       #[ ] OK
-      #.sendMessage('getUsers')
+      .sendMessage('getUsers')
       #[ ] OK
       #.sendMessage('getDates')
       #[ ] OK

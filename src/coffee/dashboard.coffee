@@ -145,7 +145,8 @@ class Dashboard
     message.course_index = moodle.getCourseIndex(message.course)
     moodle.setCourse(message.course_index)
     message.course = moodle.getCourse()
-    console.log '--> syncMEssageMissingData: o curso que foi clicado:' + message.course.name
+    console.log '--> syncMessageMissingData: o curso que foi clicado:' + message.course.name
+    console.log '--> syncMessageMissingData: propriedades do curso:' + JSON.stringify(message.course)
     @
   
   '''

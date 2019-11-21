@@ -54,6 +54,7 @@ class Moodle
             Moodle.response().sync_courses
           )
         unless @courses
+          console.log '--> syncCourses: entrou no unless @courses'
           @courses = []
         courses.each((i, course) =>
           id = parseInt(/[\\?&]id=([^&#]*)/.exec($(course).prop('href'))[1])
@@ -95,19 +96,13 @@ class Moodle
     )
     @
 
+  #[ ] need to fix some problems(??) in this function
   syncUsers: (course, response) ->
     $.ajax(
-      #regex para saber se estamos no moodle da ufsc
-      regex = /ufsc/
-      path = ''
-      if @url.match(regex)
-        url: @url + '/user/index.php?id='
-      else
-        url: @url + '/enrol/users.php'
-      #url: @url + '/enrol/users.php'
-      data:
-        id: course.id
+      url: @url + '/user/index.php?perpage=100&id=' + course.id
+      type: 'GET'
       success: (data) =>
+        console.log '--> syncUsers: ajax sucesso'
         parser = new DOMParser()
         doc = parser.parseFromString(data, 'text/html')
         list = $('table > tbody > tr', doc)
@@ -209,13 +204,15 @@ class Moodle
           Moodle.response().sync_users
         )
       error: =>
+        console.log '--> syncUsers: ajax error'
         response(
+          console.log '--> syncUsers: ajax error'
           Moodle.response().sync_no_moodle_access
           Moodle.response().sync_users
         )
     )
     @
-
+  
   syncDates: (response) ->
     unless @hasCourses()
       return response(
@@ -467,8 +464,6 @@ class Moodle
   setCourse: (id) ->
     for course, i in @courses
       course.selected = (i == id)
-      if course.selected
-        console.log '--> setCourse: O curso selecionado foi: ' + course.name
     @
 
   setUser: (role, user, selected) ->
@@ -613,7 +608,6 @@ class Moodle
   getCourse: ->
     for course in @courses
       if course.selected
-        console.log '--> getCourse: O curso retornado foi: ' + course.name
         return course
 
   getCourseList: ->
@@ -638,8 +632,10 @@ class Moodle
   getUsers: ->
     roles = @getRoles()
     for role, i in roles
+      console.log '--> getUsers(moodle): entrou no for de roles'
       role.users = []
       for user in @getCourse().users[i].list
+        console.log '--> getUsers(moodle): entrou no for de users'
         role.users.push(
           id: user.id
           picture: user.picture
