@@ -96,31 +96,95 @@ class Moodle
     )
     @
 
+  '''
+  por algum motivo a função abaixo não está sendo criada
+  por enquanto vou deixar ela ai, caso eu precise eventualmente, mas 
+  caso desnecessario, vou excluir
+  '''  
+  regexMoodle: ->
+    regexList = []
+    # Here we'll add possible moodle paths for futher maintence
+    ufsc = new RegExp(/ufsc/)
+    ufpel = new RegExp(/ufpel/)
+    
+    regexList.push(ufsc)
+    regexList.push(ufpel)    
+
+    for regex in regexList
+      if @url.match(regex)
+        actual_moodle = @url.match(regex)
+        return actual_moodle[0]
+
   #[ ] need to fix some problems(??) in this function
   syncUsers: (course, response) ->
     $.ajax(
       url: @url + '/user/index.php?perpage=100&id=' + course.id
       type: 'GET'
       success: (data) =>
-        console.log '--> syncUsers: ajax sucesso'
         parser = new DOMParser()
         doc = parser.parseFromString(data, 'text/html')
-        list = $('table > tbody > tr', doc)
+        list = $('div > table > tbody > tr', doc)
+        '''
+        Problema1: a estrutura do htlm é a mesma na UFPEL e na UFSC,
+        Entretanto, a posição das 'cell' são organizadas diferentes.
+
+        É preciso saber onde se esta trabalhando e criar uma rotina baseado no moodle utilizado.
+
+        Resolução do P1: Criei uma regex para saber onde estamos, caso novos moodles tenham problemas
+        a solução vai ser alterar essa parte da regex, pegar a peculiaridade do html dele e adicionar ao um
+        elif, criando as variaveis daquele if com os mesmo nomes, para que na frente o codigo funcione.
+
+        Problema2: Não é em todo moodle que tem a role do professor dentro de um <tr>, então vou tentar excluir
+        a role do código(já que agora o upload é local e só professores tem acesso a os logs.). 
+        '''
+        regexList = []
+        # Here we'll add possible moodle paths for futher maintence
+        ufsc = new RegExp(/ufsc/)
+        ufpel = new RegExp(/ufpel/)
+        
+        regexList.push(ufsc)
+        regexList.push(ufpel)    
+
+        for regex in regexList
+          if @url.match(regex)
+            actual_moodle = @url.match(regex)
+            break
+        
+        # NOTE: use actual_moodle[0] to get the regex return
+        if actual_moodle[0] == "ufpel"
+          picture = $('*[class="cell c1"] a', list)
+          name = $('*[class="cell c2"]', list)
+          email = $('*[class="cell c3"]', list)
+        else
+          picture = $('*[class="cell c1"] a', list)
+          name = $('*[class="cell c1"]', list)
+          email = $('*[class="cell c2"]', list)
+        '''
+        # COMENTADO PELO MOMENTO - trata o erro do html não retornar usuarios, mas tá bugado. 
         unless list.length
+          console.log '--> syncUsers: returned in the first unless line 109'
           return response(
             Moodle.response().sync_no_users,
             Moodle.response().sync_users
           )
-        a = $('*[class*="picture"] a', list)
-        b = $('*[class*="name"]', list)
-        c = $('*[class*="email"]', list)
-        d = $('*[class*="roles"]', list)
-        unless a.length || b.length || c.length || d.length
+        '''
+        #a = $('*[class*="picture"] a', list)
+        #b = $('*[class*="name"]', list)
+        #c = $('*[class*="email"]', list)
+        #d = $('*[class*="roles"]', list)
+        unless picture.length || name.length || email.length
           return response(
             Moodle.response().sync_no_users,
             Moodle.response().sync_users
           )
+        #[ ] CONCERTAR A PARTIR DAQUI - NOTA: apaguei algumas coisas.
         list.each((i) =>
+          '''
+          Nota:
+            A seguinte regex: .match(/\d+/)
+              retorna um numero composto. p.e: 1548
+          '''
+          '''
           roles = []
           $('*[class^="role"]', d[i]).each((i_r, role) ->
             id = 0
@@ -141,6 +205,8 @@ class Moodle
               id: 0
               role: 'Participant'
             )
+          '''
+          '''
           for role in roles
             ur = course.users.filter((user) => user.id == role.id)
             if ur.length
@@ -153,42 +219,44 @@ class Moodle
                 selected: false
               ) - 1
               user = course.users[p]
-            usr =
-              id: parseInt(/[\\?&]id=([^&#]*)/.exec($(a[i]).prop('href'))[1])
-              picture: $('img', a[i]).prop('src')
-              name: $(b[i]).text().replace(/\s\s/g, ' ').trim()
-              email: $(c[i]).text().trim()
-              selected: true
-            names = usr.name.toLowerCase().split(/\s/)
-            usr.firstname = names[0].replace(/\S/, (e) ->
+            '''
+          # a linha abaixo tem que estar dentro de um for
+          usr =
+            id: parseInt(/[\\?&]id=([^&#]*)/.exec($(picture[i]).prop('href'))[1])
+            picture: $('img', picture[i]).prop('src')
+            name: $(name[i]).text().replace(/\s\s/g, ' ').trim()
+            email: $(email[i]).text().trim()
+            selected: true
+          names = usr.name.toLowerCase().split(/\s/)
+          usr.firstname = names[0].replace(/\S/, (e) ->
+            e.toUpperCase()
+          )
+          if names.length > 1
+            usr.lastname = names[names.length - 1].replace(/\S/, (e) ->
               e.toUpperCase()
             )
-            if names.length > 1
-              usr.lastname = names[names.length - 1].replace(/\S/, (e) ->
-                e.toUpperCase()
-              )
-            equal = false
-            for u in user.list
-              if u.id == usr.id
-                u.picture = usr.picture
-                u.name = usr.name
-                u.firstname = usr.firstname
-                u.lastname = usr.lastname
-                u.email = usr.email
-                equal = true
-                break
-            unless equal
-              user.list.push(usr)
-              user.list.sort((a, b) ->
-                x = a.name.toLowerCase()
-                y = b.name.toLowerCase()
-                if x < y
-                  return -1
-                if x > y
-                  return 1
-                return 0
-              )
-            return
+          equal = false
+          '''
+          for u in user.list
+            if u.id == usr.id
+              u.picture = usr.picture
+              u.name = usr.name
+              u.firstname = usr.firstname
+              u.lastname = usr.lastname
+              u.email = usr.email
+              equal = true
+              break
+          '''
+          user.list.push(usr)
+          user.list.sort((a, b) ->
+            x = a.name.toLowerCase()
+            y = b.name.toLowerCase()
+            if x < y
+              return -1
+            if x > y
+              return 1
+            return 0
+          )
         )
         course.users.sort((a, b) ->
           if a.list.length > b.list.length
@@ -199,6 +267,7 @@ class Moodle
         )
         course.users[0].selected = true
         @upLastAccess()
+        console.log '--> syncUsers: mostrando usuarios json: ' + JSON.stringify(course.users)
         response(
           Moodle.response().success,
           Moodle.response().sync_users
